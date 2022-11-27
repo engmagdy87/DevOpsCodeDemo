@@ -4,7 +4,7 @@ pipeline {
   }
   agent any
   stages {
-    stage('Checkout') {
+    stage('Clone the repo') {
       steps {
         echo 'cloning'
         git 'https://github.com/Sonal0409/DevOpsClassCodes.git'
@@ -14,12 +14,6 @@ pipeline {
       steps {
         echo 'complie the code..'
         sh 'mvn compile'
-      }
-    }
-    stage('CodeReview') {
-      steps {
-        echo 'codeReview'
-        sh 'mvn pmd:pmd'
       }
     }
     stage('UnitTest') {
@@ -35,6 +29,13 @@ pipeline {
     stage('Package') {
       steps {
         sh 'mvn package'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sshagent(['tomcatId']) {
+          sh 'scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/2-ci-cd-pipeline-with-jenkins-simplilearn-assignment/target/addressbook.war ec2-user@18.216.225.163:/opt/tomcat/webapps'
+        }
       }
     }
   }
